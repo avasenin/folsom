@@ -71,6 +71,8 @@ start_link() ->
 init([]) ->
     create_tables(),
 
+    timer:apply_interval(?DEFAULT_STATS_CLEANER_INTERVAL, folsom_metrics_simple_statistics, expire_all, []),
+
     RestartStrategy = one_for_one,
     MaxRestarts = 1000,
     MaxSecondsBetweenRestarts = 3600,
@@ -108,7 +110,8 @@ create_tables() ->
               {?METER_READER_TABLE, [set, named_table, public, {write_concurrency, true}]},
               {?HISTORY_TABLE, [set, named_table, public, {write_concurrency, true}]},
               {?DURATION_TABLE, [ordered_set, named_table, public, {write_concurrency, true}]},
-              {?SPIRAL_TABLE, [set, named_table, public, {write_concurrency, true}]}
+              {?SPIRAL_TABLE, [set, named_table, public, {write_concurrency, true}]},
+              {?SIMPLE_STATISTICS_TABLE, [set, named_table, public, {write_concurrency, true}]}
              ],
     [maybe_create_table(ets:info(Name), Name, Opts) || {Name, Opts} <- Tables],
     ok.
