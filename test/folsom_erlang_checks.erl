@@ -92,7 +92,7 @@ create_metrics() ->
     2 = length(List),
 
     %% check a server got started for the spiral metric
-    1 = length(supervisor:which_children(folsom_sample_slide_sup)),
+    1 = length(supervisor:which_children(folsom_timer_server_sup)),
 
     19 = length(folsom_metrics:get_metrics()),
 

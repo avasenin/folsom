@@ -101,9 +101,9 @@ perf(Type, Size) ->
     Counter = "counter",
     [perf_ll(Type, Counter ++ integer_to_list(Y),  random(1000)) || Y <- lists:seq(0,1000), _X<- lists:seq(0, Size)].
 
-perf_ll(slow, Counter, Value) ->
+perf_ll(stats, Counter, Value) ->
   folsom_metrics:safely_notify(Counter, Value, simple_statistics);
 
-perf_ll(fast, Counter, Value) ->
+perf_ll(histogram, Counter, Value) ->
   folsom_metrics:new_histogram(Counter, slide_uniform, {60, 3}),
   folsom_metrics:safely_notify(Counter, Value).

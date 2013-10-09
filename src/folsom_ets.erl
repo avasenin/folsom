@@ -307,7 +307,7 @@ delete_metric(Name, meter_reader) ->
     ok;
 delete_metric(Name, spiral) ->
     #spiral{tid=Tid, server=Pid} = folsom_metrics_spiral:get_value(Name),
-    folsom_sample_slide_server:stop(Pid),
+    folsom_timer_server_sup:stop_timer(Pid),
     ets:delete(?SPIRAL_TABLE, Name),
     ets:delete(?FOLSOM_TABLE, Name),
     ets:delete(Tid),
@@ -333,13 +333,13 @@ delete_histogram(Name, #histogram{type = exdec}) ->
     true = ets:delete(?FOLSOM_TABLE, Name),
     ok;
 delete_histogram(Name, #histogram{type = slide, sample = #slide{reservoir = Reservoir, server=Pid}}) ->
-    folsom_sample_slide_server:stop(Pid),
+    folsom_timer_server_sup:stop_timer(Pid),
     true = ets:delete(?HISTOGRAM_TABLE, Name),
     true = ets:delete(?FOLSOM_TABLE, Name),
     true = ets:delete(Reservoir),
     ok;
 delete_histogram(Name, #histogram{type = slide_uniform, sample = #slide_uniform{reservoir = Reservoir, server=Pid}}) ->
-    folsom_sample_slide_server:stop(Pid),
+    folsom_timer_server_sup:stop_timer(Pid),
     true = ets:delete(?HISTOGRAM_TABLE, Name),
     true = ets:delete(?FOLSOM_TABLE, Name),
     true = ets:delete(Reservoir),
