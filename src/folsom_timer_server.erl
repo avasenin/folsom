@@ -1,6 +1,6 @@
 %% -------------------------------------------------------------------
 %%
-%% Copyright (c) 2013 Echo
+%% Copyright (c) 2011, Basho Technologies, Inc.
 %%
 %% This file is provided to you under the Apache License,
 %% Version 2.0 (the "License"); you may not use this file
@@ -19,7 +19,8 @@
 %% -------------------------------------------------------------------
 %%%-------------------------------------------------------------------
 %%% File:      folsom_timer_server.erl
-%%% @author    Andrey Vasenin <vasenin@aboutecho.com>
+%%% @author    Russell Brown <russelldb@basho.com>,
+%%%            Andrey Vasenin <vasenin@aboutecho.com>
 %%% @doc
 %%% Evaluates apply(Module, Function, Arguments) repeatedly at intervals of Time.
 %%% @end
@@ -55,9 +56,10 @@ handle_cast(stop, State) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info(tick, State=#state{time = Time, module = Module, func = Func, args = Args}) ->
-    Pid = erlang:send_after(Time, self(), tick),
+handle_info(tick, State=#state{time = Time, module = Module, func = Func, args = Args, timer_pid = OldTimer}) ->
+    erlang:cancel_timer(OldTimer),
     apply(Module, Func, Args),
+    Pid = erlang:send_after(Time, self(), tick),
     {noreply, State#state{timer_pid = Pid}};
 handle_info(_Info, State) -> {noreply, State}.
 

@@ -1,6 +1,6 @@
 %% -------------------------------------------------------------------
 %%
-%% Copyright (c) 2013 Echo.
+%% Copyright (c) 2011, Basho Technologies, Inc.
 %%
 %% This file is provided to you under the Apache License,
 %% Version 2.0 (the "License"); you may not use this file
@@ -19,7 +19,8 @@
 %% -------------------------------------------------------------------
 %%%-------------------------------------------------------------------
 %%% File:      folsom_timer_server_sup.erl
-%%% @author    Andrey Vasenin <vasenin@aboutecho.com>
+%%% @author    Russell Brown <russelldb@basho.com>,
+%%%            Andrey Vasenin <vasenin@aboutecho.com>
 %%% @doc
 %%% Supervisor for folsom's timers. It starts simple_one_to_one timer's
 %%% child specs

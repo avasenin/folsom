@@ -92,7 +92,7 @@ init([]) ->
     TimerSup = {folsom_timer_server_sup, {folsom_timer_server_sup, start_link, []},
                 permanent, 5000, supervisor, [folsom_timer_server_sup]},
 
-    SimpleStatsTimer = {folsom_simple_stats_cleaner,
+    SimpleStatsTimer = {folsom_simple_statistics_cleaner,
                            {folsom_timer_server, start_link, [?DEFAULT_STATS_CLEANER_INTERVAL, folsom_metrics_simple_statistics, expire_all, []]},
                            permanent, 5000, supervisor, [folsom_timer_server]},
 
