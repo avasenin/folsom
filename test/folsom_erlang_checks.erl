@@ -142,6 +142,8 @@ populate_metrics() ->
 
     [ok = folsom_metrics:notify({slide_sorted_a, Value}) || Value <- ?DATA2],
 
+    ok = folsom_metrics:notify(tagged_metric, 1, meter, [a, b]),
+
     3.141592653589793 = folsom_metrics:histogram_timed_update(timed, math, pi, []),
 
     Begin = folsom_metrics:histogram_timed_begin(timed2),
@@ -196,6 +198,8 @@ check_metrics() ->
     0 = folsom_metrics:get_metric_value(counter2),
 
     2 = folsom_metrics:get_metric_value(<<"gauge">>),
+
+    [a,b] = folsom_metrics:get_tags(tagged_metric),
 
     [11,12,13,14,15,6,7,8,9,10] = folsom_metrics:get_metric_value(noneb),
 
@@ -309,7 +313,7 @@ check_group_metrics() ->
     {counter, 0} = lists:keyfind(counter,1,Metrics).
 
 delete_metrics() ->
-    21 = length(ets:tab2list(?FOLSOM_TABLE)),
+    22 = length(ets:tab2list(?FOLSOM_TABLE)),
 
     ok = folsom_metrics:delete_metric(counter),
     ok = folsom_metrics:delete_metric(counter2),
@@ -327,6 +331,8 @@ delete_metrics() ->
     ok = folsom_metrics:delete_metric(nonea),
     ok = folsom_metrics:delete_metric(noneb),
     ok = folsom_metrics:delete_metric(nonec),
+
+    ok = folsom_metrics:delete_metric(tagged_metric),
 
     ok = folsom_metrics:delete_metric(slide_sorted_a),
 

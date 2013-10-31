@@ -36,6 +36,7 @@
          notify/1,
          notify/2,
          notify/3,
+         tagged_notify/4,
          notify_existing_metric/3,
          get_handlers/0,
          get_handlers_info/0,
@@ -43,7 +44,8 @@
          get_values/1,
          get_history_values/2,
          get_group_values/1,
-         get_group_values/2
+         get_group_values/2,
+         get_tags/1
         ]).
 
 -record(metric, {
@@ -111,11 +113,17 @@ notify(Name, Event) ->
 
 %% notify/3, makes sure metric exist, if not creates metric
 notify(Name, Event, Type) ->
+    tagged_notify(Name, Event, Type, []).
+
+%% makes sure metric exist, if not creates metric with tags
+tagged_notify(Name, Event, Type, Tags) ->
     case handler_exists(Name) of
         true ->
             notify(Name, Event, Type, true);
         false ->
-            notify(Name, Event, Type, false)
+            ok = notify(Name, Event, Type, false),
+            [add_tag(Name, Tag) || Tag <- Tags],
+            ok
     end.
 
 %% assumes metric already exists, bypasses above checks
@@ -131,8 +139,8 @@ get_handlers_info() ->
 get_info(Name) ->
     case handler_exists(Name) of
         true ->
-            [{_, #metric{type = Type}}] = ets:lookup(?FOLSOM_TABLE, Name),
-            {Name, [{type, Type}]};
+            [{_, #metric{type = Type, tags = Tags}}] = ets:lookup(?FOLSOM_TABLE, Name),
+            {Name, [{type, Type}, {tags, Tags}]};
         false ->
             {error, Name, nonexistent_metric}
     end.
@@ -176,6 +184,16 @@ get_group_values(Tag) ->
 get_group_values(Tag, Type) ->
     Metrics = ets:match(?FOLSOM_TABLE, {'$1', {metric, '$2', Type, '_'}}),
     [{Name, get_values(Name)} || [Name, Tags] <- Metrics, sets:is_element(Tag, Tags)].
+
+get_tags(Name) ->
+    case handler_exists(Name) of
+        true ->
+            {_, Info} = get_info(Name),
+            Tags = proplists:get_value(tags, Info),
+            sets:to_list(Tags);
+        false ->
+            {error, Name, nonexistent_metric}
+    end.
 
 %%%===================================================================
 %%% Internal functions
